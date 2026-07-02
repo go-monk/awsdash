@@ -4,5 +4,5 @@ Tool usage:
 
 ```sh
 $ go install github.com/go-monk/awsdash@latest
-$ awsdash
+$ awsdash -h
 ```
