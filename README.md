@@ -1,4 +1,4 @@
-Awsdash is a CLI tool and library that creates or updates custom AWS CloudWatch dashboards.
+Awsdash is a CLI tool (and library) that creates or updates custom AWS CloudWatch dashboards.
 
 Tool usage:
 
