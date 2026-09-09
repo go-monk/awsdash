@@ -25,8 +25,13 @@ type Legend struct {
 	Position string `json:"position"`
 }
 
+// ShowUnits copies YAxis/YAxisSide so it doesn't mutate the pointer shared with p.
 func (p Properties) ShowUnits() Properties {
-	p.YAxis.Left.ShowUnits = true
+	left := *p.YAxis.Left
+	left.ShowUnits = true
+	yAxis := *p.YAxis
+	yAxis.Left = &left
+	p.YAxis = &yAxis
 	return p
 }
 
