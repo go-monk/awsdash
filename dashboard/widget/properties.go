@@ -9,7 +9,7 @@ type Properties struct {
 	Metrics [][]any `json:"metrics"`
 	YAxis   *YAxis  `json:"yAxis,omitempty"`
 	Stat    string  `json:"stat,omitempty"`
-	Legend  Legend  `json:"legend,omitempty"`
+	Legend  *Legend `json:"legend,omitempty"`
 }
 
 type YAxis struct {
@@ -31,7 +31,7 @@ func (p Properties) ShowUnits() Properties {
 }
 
 func (p Properties) LegendRight() Properties {
-	p.Legend.Position = "right"
+	p.Legend = &Legend{Position: "right"}
 	return p
 }
 
