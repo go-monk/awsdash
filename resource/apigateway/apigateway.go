@@ -31,10 +31,8 @@ func Get(ctx context.Context, cfg aws.Config, tags map[string]string) (RESTs, er
 		}
 
 		for _, api := range page.Items {
-			if len(tags) > 0 {
-				if !resource.MatchesAllTags(api.Tags, tags) {
-					continue
-				}
+			if !resource.MatchesAllTags(api.Tags, tags) {
+				continue
 			}
 
 			stages, err := client.GetStages(ctx, &apigateway.GetStagesInput{

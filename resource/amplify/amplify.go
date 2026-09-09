@@ -31,10 +31,8 @@ func Get(ctx context.Context, cfg aws.Config, tags map[string]string) (Apps, err
 		}
 
 		for _, app := range page.Apps {
-			if len(tags) > 0 {
-				if !resource.MatchesAllTags(app.Tags, tags) {
-					continue
-				}
+			if !resource.MatchesAllTags(app.Tags, tags) {
+				continue
 			}
 
 			apps = append(apps, App{
