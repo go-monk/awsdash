@@ -2,8 +2,9 @@ Awsdash is a CLI tool (and library) that creates or updates custom AWS CloudWatc
 
 ```mermaid
 flowchart LR
+    cli["$ awsdash"]
+
     subgraph AWS
-        cli["$ awsdash"]
         resources["AmplifApps
 ApiGateways
 Lambdas
@@ -12,11 +13,11 @@ Lambdas
 - widget1
 - widget2
 ..."]
-
-        cli -->|"1) discover resources
-[by tag]"| resources
-        cli -->|"2) create/update"| dashboard
     end
+
+    cli -->|"1) discover resources
+[by tag]"| resources
+    cli -->|"2) create/update"| dashboard
 ```
 
 Tool usage:
