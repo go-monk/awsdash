@@ -51,7 +51,7 @@ func main() {
 	dashboard.NamePrefix = *prefix
 
 	if err := dashboard.Put(ctx, cfg, tags,
-		widget.Text(dashboard.Header(tags), 24, 2),
+		widget.Text(dashboard.Header(cfg.Region, tags), 24, 2),
 
 		widget.Text("## Amplify Apps", 24, 1),
 		widget.Metric(resources.Apps.Requests(cfg.Region), 8, 5),

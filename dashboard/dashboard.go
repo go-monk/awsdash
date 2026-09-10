@@ -22,14 +22,15 @@ type Dashboard struct {
 	Tags map[string]string
 }
 
-// Name derives a dashboard name from the [NamePrefix] and tags so that each tag set
-// maps to a stable, unique dashboard.
-func Name(tags map[string]string) string {
+// Name derives a dashboard name from the [NamePrefix], region and tags so that
+// each region/tag-set combination maps to a stable, unique dashboard.
+func Name(region string, tags map[string]string) string {
+	name := strings.Join([]string{NamePrefix, region}, "_")
 	if len(tags) == 0 {
-		return NamePrefix
+		return name
 	}
 	t := resource.Tags(tags)
-	return strings.Join([]string{NamePrefix, t.String()}, "_")
+	return strings.Join([]string{name, t.String()}, "_")
 }
 
 // List returns matching dashboard names.
@@ -41,11 +42,11 @@ func List(ctx context.Context, cfg aws.Config, tags map[string]string) ([]string
 
 	for {
 		output, err := client.ListDashboards(ctx, &cloudwatch.ListDashboardsInput{
-			DashboardNamePrefix: aws.String(Name(tags)),
+			DashboardNamePrefix: aws.String(Name(cfg.Region, tags)),
 			NextToken:           nextToken,
 		})
 		if err != nil {
-			return nil, fmt.Errorf("listing dashboards by prefix %q: %w", Name(tags), err)
+			return nil, fmt.Errorf("listing dashboards by prefix %q: %w", Name(cfg.Region, tags), err)
 		}
 
 		for _, entry := range output.DashboardEntries {
@@ -69,10 +70,10 @@ func List(ctx context.Context, cfg aws.Config, tags map[string]string) ([]string
 func Delete(ctx context.Context, cfg aws.Config, tags map[string]string) error {
 	client := cloudwatch.NewFromConfig(cfg)
 	_, err := client.DeleteDashboards(ctx, &cloudwatch.DeleteDashboardsInput{
-		DashboardNames: []string{Name(tags)},
+		DashboardNames: []string{Name(cfg.Region, tags)},
 	})
 	if err != nil {
-		return fmt.Errorf("deleting dashboards %v: %w", Name(tags), err)
+		return fmt.Errorf("deleting dashboards %v: %w", Name(cfg.Region, tags), err)
 	}
 	return nil
 }
@@ -86,7 +87,7 @@ func Put(ctx context.Context, cfg aws.Config, tags map[string]string, widgets ..
 
 	client := cloudwatch.NewFromConfig(cfg)
 	if _, err := client.PutDashboard(ctx, &cloudwatch.PutDashboardInput{
-		DashboardName: aws.String(Name(tags)),
+		DashboardName: aws.String(Name(cfg.Region, tags)),
 		DashboardBody: aws.String(body),
 	}); err != nil {
 		return err
@@ -107,11 +108,14 @@ func body(widgets ...widget.Widget) (string, error) {
 	return string(b), nil
 }
 
-// Header generates the markdown Header for the dashboard with tag information.
-func Header(tags map[string]string) string {
+// Header generates the markdown Header for the dashboard with region and tag
+// information.
+func Header(region string, tags map[string]string) string {
 	title := "# Generated with [awsdash](https://github.com/go-monk/awsdash)"
+	region = fmt.Sprintf("**%s**", region)
+
 	if len(tags) == 0 {
-		return title + "\nfor all resources"
+		return title + "\nfor all resources from " + region
 	}
 
 	// Sort keys for consistent output
@@ -128,5 +132,5 @@ func Header(tags map[string]string) string {
 	}
 	tagsList := strings.Join(tagStrings, ", ")
 
-	return title + "\nfor resources with tags: " + tagsList
+	return title + "\nfor resources from " + region + " with tags " + tagsList
 }
